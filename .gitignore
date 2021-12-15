@@ -1,0 +1,6 @@
+build
+release
+debug
+dist
+__pycache__
+.idea
