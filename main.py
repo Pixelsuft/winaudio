@@ -22,7 +22,7 @@ try:
     pydub_obj = AudioSegment.from_file(mp3_buffer, format='mp3')
     wave_buffer = io.BytesIO()
     pydub_obj.export(wave_buffer, format='wav')  # Convert To Wave
-    wave_buffer.seek(0)  # Move Cursor To The Start Of File
+    wave_buffer.seek(0)  # Move Cursor To The Start Of The File
     winaudio.play_wave_sound(wave_buffer, winaudio.SND_SYNC)
     wave_buffer.close()
 except Exception as err_:
