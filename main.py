@@ -2,6 +2,7 @@ import os
 import random
 import io
 import winaudio
+import time
 
 
 windows_sounds = winaudio.get_windows_sounds(ext_filter=('wav', ))
@@ -40,10 +41,17 @@ mp3_path = os.path.join(
 mp3 = winaudio.AudioPlayer(mp3_path, sync=False)
 
 print(f'Playing mp3: {mp3}')
+speed = mp3.get_speed()
 mp3.force_play()
 
 while mp3.is_playing():  # Wait until finish, same as "winaudio.AudioPlayer(mp3_path, sync=True)"
-    pass
+    if random.randint(0, 5) == 5:
+        speed *= random.uniform(1.1, 1.3)
+        while speed > 3:
+            speed -= 3
+        print(f'New Speed: {speed}')
+        mp3.set_speed(speed)
+    time.sleep(1)
 
 mp3.stop()
 mp3.close()

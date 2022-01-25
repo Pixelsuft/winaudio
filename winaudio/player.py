@@ -22,16 +22,16 @@ class AudioPlayer:
             buffer_size=self.buffer_size,
             encoding=self.encoding
         )
-        self.length_ms = 0
+        self.length = 0
         self.load()
 
-    def get_length_ms(self) -> int:
-        return int(self.mci.send(f'status "{self.alias}" length'))
+    def get_length(self) -> int:
+        return int(self.get_var('length'))
 
     def load(self) -> None:
         self.mci.send(f'open "{self.fn}" alias "{self.alias}"')
         self.mci.send(f'set "{self.alias}" time format milliseconds')
-        self.length_ms = self.get_length_ms()
+        self.length = self.get_length()
 
     def play(self, from_ms: any = None, to_ms: any = None) -> None:
         command = f'play "{self.alias}"'
@@ -42,12 +42,27 @@ class AudioPlayer:
         if self.sync:
             command += ' wait'
         self.mci.send(command)
+    
+    def get_var(self, var_name: str) -> str:
+        return self.mci.send(f'status "{self.alias}" {var_name}')
+    
+    def set_var(self, var_name: str, var_content: any, use_q: bool = False) -> None:
+        if use_q:
+            self.mci.send(f'set "{self.alias}" {var_name} "{var_content}"')
+        else:
+            self.mci.send(f'set "{self.alias}" {var_name} {var_content}')
 
     def get_mode(self) -> str:
-        return self.mci.send(f'status "{self.alias}" mode')
+        return self.get_var('mode')
+
+    def get_speed(self) -> float:
+        return float(self.get_var('speed')) / 1000
+
+    def set_speed(self, speed: float) -> None:
+        return self.set_var('speed', round(speed * 1000))
 
     def get_position(self) -> int:
-        return int(self.mci.send(f'status "{self.alias}" position'))
+        return int(self.get_var('position'))
 
     def is_paused(self, current_mode: str = None) -> bool:
         return (current_mode or self.get_mode()) == 'paused'
@@ -92,7 +107,7 @@ class AudioPlayer:
             return False
 
     def __str__(self, *args, **kwargs) -> str:
-        return f'<AudioPlayer file="{self.fn}" length="{self.length_ms}ms">'
+        return f'<AudioPlayer file="{self.fn}" length="{self.length}ms">'
 
     def __repr__(self, *args, **kwargs) -> str:
         return self.__str__(*args, **kwargs)
