@@ -61,6 +61,12 @@ class AudioPlayer:
     def set_speed(self, speed: float) -> None:
         return self.set_var('speed', round(speed * 1000))
 
+    def get_volume(self) -> float:
+        return float(self.get_var('volume')) / 1000
+
+    def set_volume(self, volume: float) -> None:
+        return self.set_var('volume', round(volume * 1000))
+
     def get_position(self) -> int:
         return int(self.get_var('position'))
 
@@ -78,6 +84,10 @@ class AudioPlayer:
 
     def resume(self) -> None:
         self.mci.send(f'resume "{self.alias}"')
+    
+    def wait_until_finish(self) -> None:
+        while self.is_playing():
+            pass
 
     def force_play(self, from_ms: any = None, to_ms: any = None) -> None:
         current_mode = self.get_mode()
