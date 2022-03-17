@@ -22,6 +22,7 @@ class AudioPlayer:
             buffer_size=self.buffer_size,
             encoding=self.encoding
         )
+        self.wait_on_close = True
         self.length = 0
         self.load()
 
@@ -65,7 +66,7 @@ class AudioPlayer:
         return float(self.get_var('volume')) / 1000
 
     def set_volume(self, volume: float) -> None:
-        return self.set_var('volume', round(volume * 1000))
+        self.mci.send(f'setaudio "{self.alias}" volume to {round(volume * 1000)}')
 
     def get_position(self) -> int:
         return int(self.get_var('position'))
@@ -123,4 +124,6 @@ class AudioPlayer:
         return self.__str__(*args, **kwargs)
 
     def __del__(self) -> None:
+        if self.wait_on_close and self.is_playing():
+            wait_until_finish()
         self.close()
