@@ -9,6 +9,7 @@ class AudioPlayer:
             filename: str,
             alias: str = None,
             sync: bool = False,
+            repeat: bool = False,
             buffer_size: int = 255,
             encoding: str = ENCODING
     ) -> None:
@@ -18,6 +19,7 @@ class AudioPlayer:
         self.buffer_size = buffer_size
         self.encoding = encoding
         self.sync = sync
+        self.repeat = repeat
         self.mci = MCI(
             buffer_size=self.buffer_size,
             encoding=self.encoding
@@ -40,6 +42,8 @@ class AudioPlayer:
             command += f' from {from_ms}'
         if to_ms:
             command += f' to {to_ms}'
+        if self.repeat:
+            command += ' repeat'
         if self.sync:
             command += ' wait'
         self.mci.send(command)
